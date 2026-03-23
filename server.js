@@ -16,64 +16,6 @@ app.use(express.json());
 const dbUri = process.env.MONGO_URI;
 
 
-// Seed Data
-const seedData = async () => {
-    try {
-        const studentCount = await Student.countDocuments();
-        if (studentCount > 0) {
-            console.log('Database already has data, skipping seed.');
-            return;
-        }
-
-        const hashedPassword = await bcrypt.hash('kavi2005', 10);
-        const initialStudents = [
-            { id: '73772214150', password: hashedPassword, name: 'Kaviyarasu S', semester: 4, isFirstLogin: false },
-        ];
-        await Student.insertMany(initialStudents);
-        console.log('Students seeded');
-
-        const initialResults = [
-            {
-                studentId: '73772214150',
-                semester: 1,
-                gpa: 9.08,
-                subjects: [
-                    { code: 'CS101', name: 'Intro to Programming', marks: 95, grade: 'O', credits: 4, attempt: 1, year: '2023' },
-                    { code: 'MA101', name: 'Calculus I', marks: 88, grade: 'A+', credits: 4, attempt: 1, year: '2023' },
-                    { code: 'PH101', name: 'Physics', marks: 92, grade: 'O', credits: 3, attempt: 1, year: '2023' },
-                    { code: 'EN101', name: 'English Communication', marks: 85, grade: 'A+', credits: 2, attempt: 1, year: '2023' }
-                ]
-            },
-            {
-                studentId: '73772214150',
-                semester: 2,
-                gpa: 8.79,
-                subjects: [
-                    { code: 'CS102', name: 'Data Structures', marks: 89, grade: 'A+', credits: 4, attempt: 1, year: '2023' },
-                    { code: 'MA102', name: 'Calculus II', marks: 85, grade: 'A+', credits: 4, attempt: 1, year: '2023' },
-                    { code: 'CH101', name: 'Chemistry', marks: 88, grade: 'A+', credits: 3, attempt: 1, year: '2023' },
-                    { code: 'EG101', name: 'Engineering Graphics', marks: 55, grade: 'B', credits: 3, attempt: 1, year: '2023' }
-                ]
-            },
-            {
-                studentId: '73772214150',
-                semester: 3,
-                gpa: 8.09,
-                subjects: [
-                    { code: 'CS201', name: 'Algorithms', marks: 52, grade: 'B', credits: 4, attempt: 1, year: '2024' },
-                    { code: 'CS202', name: 'Digital Logic', marks: 78, grade: 'A', credits: 3, attempt: 1, year: '2024' },
-                    { code: 'MA201', name: 'Linear Algebra', marks: 85, grade: 'A+', credits: 4, attempt: 1, year: '2024' }
-                ]
-            }
-        ];
-        await Result.insertMany(initialResults);
-        console.log('Results seeded');
-
-    } catch (err) {
-        console.log('Seeding error:', err);
-    }
-};
-
 // Routes
 app.post('/api/login', async (req, res) => {
     const { username, password } = req.body;
@@ -667,7 +609,6 @@ app.get('/api/student/:id/stats', async (req, res) => {
 mongoose.connect(dbUri)
     .then(() => {
         console.log('MongoDB connected');
-        seedData();
         app.listen(PORT, '0.0.0.0', () => {
             console.log(`Server running on port ${PORT}`);
             const interfaces = require('os').networkInterfaces();
