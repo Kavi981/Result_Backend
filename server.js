@@ -439,22 +439,28 @@ app.post("/api/upload", upload.single("file"), async (req, res) => {
                 const studentId = String(regNo).trim();
                 const hashedPassword = await bcrypt.hash(studentId, 10);
 
-                const nameStr = name ? String(name).trim() : 'Unknown Student';
                 const updateFields = {
-                    name: nameStr,
                     semester: semester
                 };
+                
+                const setOnInsertFields = {
+                    id: studentId,
+                    password: hashedPassword,
+                    isFirstLogin: true
+                };
+
+                if (name) {
+                    updateFields.name = String(name).trim();
+                } else {
+                    setOnInsertFields.name = 'Unknown Student';
+                }
 
                 studentsToUpsert.push({
                     updateOne: {
                         filter: { id: studentId },
                         update: {
                             $set: updateFields,
-                            $setOnInsert: {
-                                id: studentId,
-                                password: hashedPassword,
-                                isFirstLogin: true
-                            }
+                            $setOnInsert: setOnInsertFields
                         },
                         upsert: true
                     }
